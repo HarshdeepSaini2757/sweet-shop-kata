@@ -30,6 +30,11 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     token = auth.create_access_token(data={"sub": user.username})
     return {"access_token": token, "token_type": "bearer"}
 
+# Add this function to main.py to fix the 405 error
+@app.get("/api/sweets", response_model=List[schemas.Sweet])
+def read_sweets(db: Session = Depends(database.get_db)):
+    return db.query(models.Sweet).all()
+
 @app.get("/api/sweets/search", response_model=List[schemas.Sweet])
 def search_sweets(q: str = "", db: Session = Depends(database.get_db)):
     return db.query(models.Sweet).filter(models.Sweet.name.contains(q)).all()
